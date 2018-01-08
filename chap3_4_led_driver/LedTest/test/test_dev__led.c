@@ -31,3 +31,10 @@ void test_TurnOffLedOne(void)
     dev__led_clear( 1 );
     TEST_ASSERT_EQUAL_HEX16( 0 , virtualLeds );
 }
+
+void test_TurnOnMultipleLeds(void)
+{
+    dev__led_set(8);
+    dev__led_set(9);
+    TEST_ASSERT_EQUAL_HEX16( 0x180 , virtualLeds );
+}
