@@ -3,6 +3,6 @@
 
 #define MAX_FIFO_LEN 16
 
-void dev__fifo_init( int * buf , int size );
+int * dev__fifo_init( void );
 
 #endif // _DEV__FIFO_H

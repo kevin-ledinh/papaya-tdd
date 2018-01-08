@@ -1,7 +1,9 @@
 #include "dev__fifo.h"
 #include <string.h>
 
-void dev__fifo_init( int * buf , int size )
+static int fifo_buf[ MAX_FIFO_LEN ];
+
+int * dev__fifo_init( void )
 {
-    memset( buf , 0 , size * sizeof( int ) );
+    memset( fifo_buf , 0 , MAX_FIFO_LEN * sizeof( int ) );
 }
