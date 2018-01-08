@@ -20,6 +20,7 @@ enum
  *    PRIVATE DATA
  ******************************************************************************/
 static uint16_t * led_addr;
+static uint16_t ledsImage;
 
 /*******************************************************************************
  *    PROTOTYPES
@@ -37,6 +38,7 @@ static uint16_t dev__led_convert_led_number_to_bit( int led_number );
 void dev__led_init( uint16_t * address )
 {
     led_addr = address;
+    ledsImage = ALL_LEDS_OFF;
     * led_addr = 0;
 }
 
@@ -54,7 +56,8 @@ void dev__led_deinit( void )
 *******************************************************************************/
 void dev__led_set( int led_number )
 {
-    * led_addr |= dev__led_convert_led_number_to_bit( led_number );
+    ledsImage |= dev__led_convert_led_number_to_bit( led_number );
+    * led_addr = ledsImage;
 }
 
 /*****************************************************************************
@@ -63,7 +66,8 @@ void dev__led_set( int led_number )
 *******************************************************************************/
 void dev__led_clear( int led_number )
 {
-    * led_addr = 0;
+    ledsImage &= ~( dev__led_convert_led_number_to_bit( led_number ) );
+    * led_addr = ledsImage;
 }
 
 /*****************************************************************************
@@ -72,7 +76,8 @@ void dev__led_clear( int led_number )
 *******************************************************************************/
 void dev__led_set_all( void )
 {
-    * led_addr = ALL_LEDS_ON;
+    ledsImage = ALL_LEDS_ON;
+    * led_addr = ledsImage;
 }
     
 /*******************************************************************************

@@ -45,10 +45,16 @@ void test_TurnOnAllLeds(void)
     TEST_ASSERT_EQUAL_HEX16( 0xFFFF , virtualLeds );
 }
 
-//void test_TurnOffAnyLeds(void)
-//{
-//    dev__led_set(9);
-//    dev__led_set(8); 
-//    dev__led_clear(8);
-//    TEST_ASSERT_EQUAL_HEX16(0x100, virtualLeds);
-//}
+void test_TurnOffAnyLeds(void)
+{
+    dev__led_set_all();
+    dev__led_clear(8);
+    TEST_ASSERT_EQUAL_HEX16(0xff7f, virtualLeds);
+}
+
+void test_LedMemoryIsNotReadable(void)
+{
+    virtualLeds = 0xFFF;
+    dev__led_set(8);
+    TEST_ASSERT_EQUAL_HEX16( 0x80 , virtualLeds );
+}
