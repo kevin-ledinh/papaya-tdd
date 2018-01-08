@@ -9,7 +9,9 @@ void tearDown(void)
 {
 }
 
-void test_dev__fifo_NeedToImplement(void)
+void test_InitializeAllElementsToZeros(void)
 {
-    TEST_IGNORE_MESSAGE("Need to Implement dev__fifo");
+    int fifo_buf[ MAX_FIFO_LEN ];
+    dev__fifo_init( fifo_buf , MAX_FIFO_LEN );
+    TEST_ASSERT_EACH_EQUAL_INT( 0 , fifo_buf , MAX_FIFO_LEN );
 }
