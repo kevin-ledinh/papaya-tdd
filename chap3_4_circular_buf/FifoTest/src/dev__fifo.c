@@ -8,6 +8,11 @@ void dev__fifo_init( void )
     memset( fifo_buf , 0 , MAX_FIFO_LEN * sizeof( int ) );
 }
 
+void dev__fifo_put( int value )
+{
+    fifo_buf[ 0 ] = value;
+}
+
 /* This function should only be used for testing purpose only */
 int * dev__fifo_get_fifo_address( void )
 {
