@@ -20,12 +20,13 @@ enum
  *    PRIVATE DATA
  ******************************************************************************/
 static uint16_t * led_addr;
-static uint16_t ledsImage;
+static uint16_t leds_image;
 
 /*******************************************************************************
  *    PROTOTYPES
  ******************************************************************************/
 static uint16_t dev__led_convert_led_number_to_bit( int led_number );
+static void dev__led_update_hardware(void);
 
 /*******************************************************************************
 *    PUBLIC FUNCTIONS
@@ -38,8 +39,8 @@ static uint16_t dev__led_convert_led_number_to_bit( int led_number );
 void dev__led_init( uint16_t * address )
 {
     led_addr = address;
-    ledsImage = ALL_LEDS_OFF;
-    * led_addr = 0;
+    leds_image = ALL_LEDS_OFF;
+    dev__led_update_hardware();
 }
 
 /*****************************************************************************
@@ -56,8 +57,8 @@ void dev__led_deinit( void )
 *******************************************************************************/
 void dev__led_set( int led_number )
 {
-    ledsImage |= dev__led_convert_led_number_to_bit( led_number );
-    * led_addr = ledsImage;
+    leds_image |= dev__led_convert_led_number_to_bit( led_number );
+    dev__led_update_hardware();
 }
 
 /*****************************************************************************
@@ -66,8 +67,8 @@ void dev__led_set( int led_number )
 *******************************************************************************/
 void dev__led_clear( int led_number )
 {
-    ledsImage &= ~( dev__led_convert_led_number_to_bit( led_number ) );
-    * led_addr = ledsImage;
+    leds_image &= ~( dev__led_convert_led_number_to_bit( led_number ) );
+    dev__led_update_hardware();
 }
 
 /*****************************************************************************
@@ -76,8 +77,8 @@ void dev__led_clear( int led_number )
 *******************************************************************************/
 void dev__led_set_all( void )
 {
-    ledsImage = ALL_LEDS_ON;
-    * led_addr = ledsImage;
+    leds_image = ALL_LEDS_ON;
+    dev__led_update_hardware();
 }
     
 /*******************************************************************************
@@ -91,4 +92,9 @@ void dev__led_set_all( void )
 static uint16_t dev__led_convert_led_number_to_bit( int led_number )
 {
     return 1 << (led_number - 1);
+}
+
+static void dev__led_update_hardware(void)
+{
+    * led_addr = leds_image;
 }
