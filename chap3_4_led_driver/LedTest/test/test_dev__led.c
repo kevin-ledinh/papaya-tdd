@@ -58,3 +58,10 @@ void test_LedMemoryIsNotReadable(void)
     dev__led_set(8);
     TEST_ASSERT_EQUAL_HEX16( 0x80 , virtualLeds );
 }
+
+void test_UpperAndLowerBound(void)
+{
+    dev__led_set(1);
+    dev__led_set(16);
+    TEST_ASSERT_EQUAL_HEX16( 0x8001 , virtualLeds );
+}
