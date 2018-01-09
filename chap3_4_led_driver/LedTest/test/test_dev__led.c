@@ -93,3 +93,8 @@ void test_OutOfBoundProducesRuntimeError(void)
     TEST_ASSERT_EQUAL_STRING("LED Driver: out-of-bounds LED", RuntimeErrorStub_GetLastError());
     TEST_ASSERT_EQUAL(-1, RuntimeErrorStub_GetLastParameter());
 }
+
+void test_OutOfBOundTodo(void)
+{
+    TEST_IGNORE();
+}
