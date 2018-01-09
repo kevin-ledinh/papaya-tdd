@@ -90,3 +90,5 @@ void test_GetElementAfterOutOfBound(void)
         TEST_ASSERT_EQUAL_INT( expected_values[ count ] , dev__fifo_get() );
     }
 }
+
+//TODO: test for empty Fifo when do a get()
