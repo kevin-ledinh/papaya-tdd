@@ -2,6 +2,7 @@
  *    INCLUDED FILES
  ******************************************************************************/
  #include "dev__led.h"
+ #include "RuntimeError.h"
  
 /*******************************************************************************
  *    DEFINITIONS
@@ -59,6 +60,7 @@ void dev__led_set( int led_number )
 {
     if ( led_number <= 0 || led_number > 16 )
     {    
+        RUNTIME_ERROR("LED Driver: out-of-bounds LED" , led_number);
         return;
     }   
     

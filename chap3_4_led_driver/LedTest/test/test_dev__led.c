@@ -1,5 +1,6 @@
 #include "unity.h"
 #include "dev__led.h"
+#include "RuntimeErrorStub.h"
 
 static uint16_t virtualLeds;
 
@@ -84,4 +85,11 @@ void test_OutOfBoundTurnOffDoesNoHarm(void)
     dev__led_clear(17);
     dev__led_clear(3141);
     TEST_ASSERT_EQUAL_HEX16(0xFFFF, virtualLeds);
+}
+
+void test_OutOfBoundProducesRuntimeError(void)
+{
+    dev__led_set(-1);
+    TEST_ASSERT_EQUAL_STRING("LED Driver: out-of-bounds LED", RuntimeErrorStub_GetLastError());
+    TEST_ASSERT_EQUAL(-1, RuntimeErrorStub_GetLastParameter());
 }
