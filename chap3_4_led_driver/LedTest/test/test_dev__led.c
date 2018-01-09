@@ -98,3 +98,27 @@ void test_OutOfBOundTodo(void)
 {
     TEST_IGNORE();
 }
+
+void test_IsLedOn(void)
+{
+    TEST_ASSERT_FALSE(dev__led_is_on(11));
+    dev__led_set(11);
+    TEST_ASSERT_TRUE(dev__led_is_on(11));
+}
+
+void test_OutOfBoundLedsAreAlwaysOff(void)
+{
+    TEST_ASSERT_TRUE(dev__led_is_off(0));
+    TEST_ASSERT_TRUE(dev__led_is_off(17));
+    TEST_ASSERT_FALSE(dev__led_is_on(0));
+    TEST_ASSERT_FALSE(dev__led_is_on(17));
+
+}
+
+void test_IsLedOff(void)
+{
+    dev__led_set_all();
+    TEST_ASSERT_FALSE(dev__led_is_off(11));
+    dev__led_clear(11);
+    TEST_ASSERT_TRUE(dev__led_is_off(11));
+}
