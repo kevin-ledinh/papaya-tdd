@@ -23,6 +23,7 @@
 static int dev__fifo_buf[ MAX_FIFO_LEN ];
 static int dev__fifo_wr_idx;
 static int dev__fifo_rd_idx;
+static int dev__fifo_number_of_entries;
 
 /*******************************************************************************
  *    PROTOTYPES
@@ -41,6 +42,7 @@ void dev__fifo_init( void )
     memset( dev__fifo_buf , 0 , MAX_FIFO_LEN * sizeof( int ) );
     dev__fifo_wr_idx = 0;
     dev__fifo_rd_idx = 0;
+    dev__fifo_number_of_entries = 0;
 }
 
 /*****************************************************************************
@@ -49,7 +51,17 @@ void dev__fifo_init( void )
 *******************************************************************************/
 void dev__fifo_put( int value )
 {
-    dev__fifo_buf[ dev__fifo_wr_idx ++ ] = value;
+    dev__fifo_buf[ dev__fifo_wr_idx ] = value;
+    
+    if( ++ dev__fifo_number_of_entries >= MAX_FIFO_LEN )
+    {
+        dev__fifo_number_of_entries = MAX_FIFO_LEN;
+    }
+    
+    if( ++ dev__fifo_wr_idx >= MAX_FIFO_LEN )
+    {
+        dev__fifo_wr_idx = 0;
+    }
 }
 
 /*****************************************************************************
@@ -58,7 +70,31 @@ void dev__fifo_put( int value )
 *******************************************************************************/
 int dev__fifo_get( void )
 {
-    return dev__fifo_buf[ dev__fifo_rd_idx ++ ];
+    int result;
+    if( dev__fifo_number_of_entries == MAX_FIFO_LEN )
+    {
+        dev__fifo_rd_idx = dev__fifo_wr_idx;
+    }
+    
+    result = dev__fifo_buf[ dev__fifo_rd_idx ];
+    
+    dev__fifo_number_of_entries --;
+    
+    if( ++ dev__fifo_rd_idx >= MAX_FIFO_LEN )
+    {
+        dev__fifo_rd_idx = 0;
+    }
+    
+    return result;
+}
+
+/*****************************************************************************
+ *  Function:
+ *  Purpose: Get the number of element of the circular buffer
+*******************************************************************************/
+int dev__fifo_get_available_entries()
+{
+    return dev__fifo_number_of_entries;
 }
 
 /*****************************************************************************
