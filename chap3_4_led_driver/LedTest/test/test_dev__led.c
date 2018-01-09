@@ -40,10 +40,25 @@ void test_TurnOnMultipleLeds(void)
     TEST_ASSERT_EQUAL_HEX16( 0x180 , virtualLeds );
 }
 
+void test_TurnOffMultipleLeds(void)
+{
+    dev__led_set_all();
+    dev__led_clear(9);
+    dev__led_clear(8);
+    TEST_ASSERT_EQUAL_HEX16((~0x180)&0xffff, virtualLeds);
+}
+
 void test_TurnOnAllLeds(void)
 {
     dev__led_set_all();
     TEST_ASSERT_EQUAL_HEX16( 0xFFFF , virtualLeds );
+}
+
+void test_TurnOffAllLeds(void)
+{
+    dev__led_set_all();
+    dev__led_clear_all();
+    TEST_ASSERT_EQUAL_HEX16( 0 , virtualLeds );
 }
 
 void test_TurnOffAnyLeds(void)

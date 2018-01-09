@@ -105,6 +105,16 @@ void dev__led_set_all( void )
  *  Function:
  *  Purpose:
 *******************************************************************************/
+void dev__led_clear_all ( void )
+{
+    leds_image = ALL_LEDS_OFF;
+    dev__led_update_hardware();
+}
+
+/*****************************************************************************
+ *  Function:
+ *  Purpose:
+*******************************************************************************/
 bool dev__led_is_on ( int led_number )
 {
     if ( dev__led_is_led_out_of_bounds( led_number ) )
