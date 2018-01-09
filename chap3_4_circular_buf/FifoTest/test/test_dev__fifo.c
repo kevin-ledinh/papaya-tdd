@@ -29,6 +29,21 @@ void test_AddOneElementToFifo(void)
 void test_GetOneElementFromFifo(void)
 {
     dev__fifo_put(123);
-    int result = dev__fifo_get();
-    TEST_ASSERT_EQUAL_INT( 123 , result );
+    TEST_ASSERT_EQUAL_INT( 123 , dev__fifo_get() );
+}
+
+void test_AddMultipleElementsToFifo(void)
+{
+    dev__fifo_put(123);
+    dev__fifo_put(456);
+    TEST_ASSERT_EQUAL_INT( 123 , fifo_addr[ 0 ] );
+    TEST_ASSERT_EQUAL_INT( 456 , fifo_addr[ 1 ] );
+}
+
+void test_GetMultipleElementsFromFifo(void)
+{
+    dev__fifo_put(123);
+    dev__fifo_put(456);
+    TEST_ASSERT_EQUAL_INT( 123 , dev__fifo_get() );
+    TEST_ASSERT_EQUAL_INT( 456 , dev__fifo_get() );
 }
