@@ -57,6 +57,11 @@ void dev__led_deinit( void )
 *******************************************************************************/
 void dev__led_set( int led_number )
 {
+    if ( led_number <= 0 || led_number > 16 )
+    {    
+        return;
+    }   
+    
     leds_image |= dev__led_convert_led_number_to_bit( led_number );
     dev__led_update_hardware();
 }
@@ -67,6 +72,11 @@ void dev__led_set( int led_number )
 *******************************************************************************/
 void dev__led_clear( int led_number )
 {
+    if ( led_number <= 0 || led_number > 16 )
+    {    
+        return;
+    }   
+    
     leds_image &= ~( dev__led_convert_led_number_to_bit( led_number ) );
     dev__led_update_hardware();
 }

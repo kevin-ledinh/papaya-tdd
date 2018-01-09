@@ -65,3 +65,23 @@ void test_UpperAndLowerBound(void)
     dev__led_set(16);
     TEST_ASSERT_EQUAL_HEX16( 0x8001 , virtualLeds );
 }
+
+void test_OutOfBoundTurnOnDoesNoHarm(void)
+{
+    dev__led_set(-1);
+    dev__led_set(0);
+    dev__led_set(17);
+    dev__led_set(3141);
+    TEST_ASSERT_EQUAL_HEX16(0, virtualLeds);
+}
+
+void test_OutOfBoundTurnOffDoesNoHarm(void)
+{
+    dev__led_set_all();
+    
+    dev__led_clear(-1);
+    dev__led_clear(0);
+    dev__led_clear(17);
+    dev__led_clear(3141);
+    TEST_ASSERT_EQUAL_HEX16(0xFFFF, virtualLeds);
+}
