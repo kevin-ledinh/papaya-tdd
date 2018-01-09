@@ -2,6 +2,7 @@
  *    INCLUDED FILES
  ******************************************************************************/
  #include "dev__led.h"
+ #include <stdbool.h>
  #include "RuntimeError.h"
  
 /*******************************************************************************
@@ -17,6 +18,12 @@ enum
     ALL_LEDS_OFF = ~ALL_LEDS_ON
 };
  
+enum 
+{
+    FIRST_LED = 1, 
+    LAST_LED = 16
+};
+
 /*******************************************************************************
  *    PRIVATE DATA
  ******************************************************************************/
@@ -28,6 +35,9 @@ static uint16_t leds_image;
  ******************************************************************************/
 static uint16_t dev__led_convert_led_number_to_bit( int led_number );
 static void dev__led_update_hardware(void);
+static bool dev__led_is_led_out_of_bounds(int led_number);
+static void dev__led_set_led_image_bit(int led_number);
+static void dev__led_clear_led_image_bit(int led_number);
 
 /*******************************************************************************
 *    PUBLIC FUNCTIONS
@@ -58,13 +68,12 @@ void dev__led_deinit( void )
 *******************************************************************************/
 void dev__led_set( int led_number )
 {
-    if ( led_number <= 0 || led_number > 16 )
+    if ( dev__led_is_led_out_of_bounds( led_number ) )
     {    
-        RUNTIME_ERROR("LED Driver: out-of-bounds LED" , led_number);
         return;
     }   
     
-    leds_image |= dev__led_convert_led_number_to_bit( led_number );
+    dev__led_set_led_image_bit( led_number );
     dev__led_update_hardware();
 }
 
@@ -74,12 +83,12 @@ void dev__led_set( int led_number )
 *******************************************************************************/
 void dev__led_clear( int led_number )
 {
-    if ( led_number <= 0 || led_number > 16 )
+    if ( dev__led_is_led_out_of_bounds( led_number ) )
     {    
         return;
     }   
     
-    leds_image &= ~( dev__led_convert_led_number_to_bit( led_number ) );
+    dev__led_clear_led_image_bit( led_number );
     dev__led_update_hardware();
 }
 
@@ -109,4 +118,20 @@ static uint16_t dev__led_convert_led_number_to_bit( int led_number )
 static void dev__led_update_hardware(void)
 {
     * led_addr = leds_image;
+}
+
+static bool dev__led_is_led_out_of_bounds(int led_number)
+{
+    RUNTIME_ERROR("LED Driver: out-of-bounds LED" , led_number);
+    return (led_number < FIRST_LED) || (led_number > LAST_LED);
+}
+
+static void dev__led_set_led_image_bit(int led_number)
+{
+    leds_image |= dev__led_convert_led_number_to_bit(led_number);
+}
+
+static void dev__led_clear_led_image_bit(int led_number)
+{
+    leds_image &= ~dev__led_convert_led_number_to_bit( led_number );
 }
