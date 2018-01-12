@@ -59,7 +59,9 @@ void fsm__post( fsm_t * self , uint8_t signal_idx )
 {
     if( signal_idx < ( self -> number_of_signals ) )
     {
+        //Enter Critical reagion
         self -> signal_sets |= ( 1 << signal_idx );
+        //Exit Critical reagion
     }
 }
 
@@ -83,9 +85,10 @@ void fsm__change_state( fsm_t * self , fsm__state_t state_id )
  *******************************************************************************/
 void fsm__main( fsm_t * self )
 {
+    fsm__signal_sets_t signals;
     while(1)
     {
-        fsm__signal_sets_t signals = fsm__pend( self );        
+        signals = fsm__pend( self );        
         fsm__despatch( self , signals );
     }
 }
