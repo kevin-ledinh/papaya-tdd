@@ -56,6 +56,7 @@ void fsm__init( fsm_t * self , uint8_t total_signals , uint8_t total_states , co
 void fsm__none( void );
 void fsm__post( fsm_t * self , uint8_t signal_idx );
 void fsm__change_state( fsm_t * self , fsm__state_t state_id );
+void fsm__main( fsm_t * self );
  
  
 #endif // _FSM_H
