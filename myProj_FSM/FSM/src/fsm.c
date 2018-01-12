@@ -32,11 +32,22 @@
   *  Function:
   *  Purpose:
  *******************************************************************************/
-void fsm__init( fsm_t * self , uint8_t total_signals , uint8_t total_states , const fsm__state_table_t * state_table , fsm__state initial_state )
+void fsm__init( fsm_t * self , uint8_t total_signals , uint8_t total_states , const fsm__state_table_t * state_table , fsm__state_t initial_state )
 {
-    
+    self -> number_of_signals = total_signals;
+    self -> number_of_states = total_states;
+    self -> state_table = state_table;
+    self -> state = initial_state;
+    self -> signal_sets = 0;
 }
-
+ 
+ /*****************************************************************************
+  *  Function:
+  *  Purpose:
+ *******************************************************************************/
+void fsm__none( void )
+{
+}
 /*******************************************************************************
  *    PRIVATE FUNCTIONS
  ******************************************************************************/
