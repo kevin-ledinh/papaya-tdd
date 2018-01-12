@@ -49,13 +49,14 @@ typedef struct fsm__state_table_s
     uint8_t number_of_states;
     const fsm__state_table_t * state_table;
     fsm__state_t state;
-    fsm__signal_sets_t signal_sets;
+    volatile fsm__signal_sets_t signal_sets;
 } fsm_t;
 /*******************************************************************************
  *    PROTOTYPES
  ******************************************************************************/
 void fsm__init( fsm_t * self , uint8_t total_signals , uint8_t total_states , const fsm__state_table_t * state_table , fsm__state_t initial_state );
 void fsm__none( void );
+void fsm__post( fsm_t * self , uint8_t signal_idx );
  
  
 #endif // _FSM_H

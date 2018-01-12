@@ -39,6 +39,7 @@ static fsm_t fsm;
 
 void setUp(void)
 {
+    fsm__init( & fsm , fsm__transition_signal_id_number_of , fsm__state_id_number_of , fsm__state_table , fsm__state_id_1 );
 }
 
 void tearDown(void)
@@ -67,4 +68,26 @@ void test_fsm_CorrectDataAfterInitialisation(void)
 
         }
     }
+}
+
+void test_fsm_PostASingleSignal(void)
+{
+    fsm__post( & fsm , fsm__transition_signal_id_1 );
+    fsm__signal_sets_t test_sets = 0 | ( 1 << fsm__transition_signal_id_1 );    
+    TEST_ASSERT_EQUAL_INT( test_sets , fsm.signal_sets );
+}
+
+void test_fsm_PostMultipleSignals(void)
+{
+    fsm__post( & fsm , fsm__transition_signal_id_1 );
+    fsm__post( & fsm , fsm__transition_signal_id_5 );
+    fsm__signal_sets_t test_sets = 0 | ( 1 << fsm__transition_signal_id_1 ); 
+    test_sets |= ( 1 << fsm__transition_signal_id_5 );    
+    TEST_ASSERT_EQUAL_INT( test_sets , fsm.signal_sets );
+}
+
+void test_fsm_PostOutofBoundSignalShouldReturnZero(void)
+{
+    fsm__post( & fsm , 10 );
+    TEST_ASSERT_EQUAL_INT( 0 , fsm.signal_sets );
 }

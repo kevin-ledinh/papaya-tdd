@@ -43,10 +43,22 @@ void fsm__init( fsm_t * self , uint8_t total_signals , uint8_t total_states , co
  
  /*****************************************************************************
   *  Function:
-  *  Purpose:
+  *  Purpose: Dummy function without any operation.
  *******************************************************************************/
 void fsm__none( void )
 {
+}
+ 
+ /*****************************************************************************
+  *  Function:
+  *  Purpose: Insert a signal into the current signal set
+ *******************************************************************************/
+void fsm__post( fsm_t * self , uint8_t signal_idx )
+{
+    if( signal_idx < ( self -> number_of_signals ) )
+    {
+        self -> signal_sets |= ( 1 << signal_idx );
+    }
 }
 /*******************************************************************************
  *    PRIVATE FUNCTIONS
