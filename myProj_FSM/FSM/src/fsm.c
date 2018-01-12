@@ -136,11 +136,11 @@ void fsm__despatch( fsm_t * self , fsm__signal_sets_t signals )
 static void fsm__despatch( fsm_t * self , fsm__signal_sets_t signals )
 #endif
 {
-   // for( int i = 0 ; i < ( self -> number_of_signals ) ; i ++ )
-   // {
-       // if( ( ( signals >> i ) & 1 ) == 1 )
-       // {
-           // self -> state_table[ self -> state ].transition_table[ i ].action();
-       // }
-   // }
+    for( int i = 0 ; i < ( self -> number_of_signals ) ; i ++ )
+    {
+        if( ( ( signals >> i ) & 1 ) == 1 )
+        {
+           self -> state_table[ self -> state ].transition_table[ i ].action();
+        }
+    }
 }
