@@ -26,8 +26,6 @@
 typedef uint8_t fsm__state_t;
 typedef uint32_t fsm__signal_sets_t;
 typedef void ( * fsm__action_t )      ( void );
-typedef void ( * fsm__on_entry_t )    ( void );
-typedef void ( * fsm__on_exit_t )     ( void );
 typedef void ( * fsm__on_yield_t )    ( void );
 
 typedef struct fsm__transition_table_s
@@ -38,9 +36,9 @@ typedef struct fsm__transition_table_s
 typedef struct fsm__state_table_s
 {
     const fsm__transition_table_t * transition_table;
-    fsm__on_entry_t   on_entry;
-    fsm__on_exit_t    on_exit;
-    fsm__on_yield_t   on_yield;
+    fsm__action_t   on_entry;
+    fsm__action_t   on_exit;
+    fsm__on_yield_t on_yield;
 }fsm__state_table_t;
  
  typedef struct fsm_s
@@ -57,6 +55,7 @@ typedef struct fsm__state_table_s
 void fsm__init( fsm_t * self , uint8_t total_signals , uint8_t total_states , const fsm__state_table_t * state_table , fsm__state_t initial_state );
 void fsm__none( void );
 void fsm__post( fsm_t * self , uint8_t signal_idx );
+void fsm__change_state( fsm_t * self , fsm__state_t state_id );
  
  
 #endif // _FSM_H

@@ -60,6 +60,20 @@ void fsm__post( fsm_t * self , uint8_t signal_idx )
         self -> signal_sets |= ( 1 << signal_idx );
     }
 }
+
+/*****************************************************************************
+  *  Function:
+  *  Purpose: Change the FSM to a new state
+ *******************************************************************************/
+void fsm__change_state( fsm_t * self , fsm__state_t state_id )
+{
+    if( state_id < ( self -> number_of_states ) )
+    {
+        self -> state_table[ self -> state ].on_exit();
+        self -> state = state_id;
+        self -> state_table[ self -> state ].on_entry();
+    }
+}
 /*******************************************************************************
  *    PRIVATE FUNCTIONS
  ******************************************************************************/

@@ -88,6 +88,18 @@ void test_fsm_PostMultipleSignals(void)
 
 void test_fsm_PostOutofBoundSignalShouldReturnZero(void)
 {
-    fsm__post( & fsm , 10 );
+    fsm__post( & fsm , fsm__transition_signal_id_number_of + 5 );
     TEST_ASSERT_EQUAL_INT( 0 , fsm.signal_sets );
+}
+
+void test_fsm_ChangeState(void)
+{
+    fsm__change_state( & fsm , fsm__state_id_2 );
+    TEST_ASSERT_EQUAL_INT( fsm__state_id_2 , fsm.state );    
+}
+
+void test_fsm_InvalidStateShouldBeZero(void)
+{
+    fsm__change_state( & fsm , fsm__state_id_number_of );
+    TEST_ASSERT_EQUAL_INT( 0 , fsm.state );
 }
