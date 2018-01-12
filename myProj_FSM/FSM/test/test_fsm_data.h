@@ -3,18 +3,18 @@
  *    Copyright 2018
  ******************************************************************************/
 /**************************************************************************
-*   Briefs:
+*   Briefs: This file contains test data for the purpose of testing FSM implementation
 *
 *
 *****************************************************************************/
-
-#ifndef _FSM_H
-#define _FSM_H
-
+ 
+ 
+#ifndef TEST_FSM_DATA_H
+#define TEST_FSM_DATA_H
+ 
 /*******************************************************************************
  *    INCLUDED FILES
  ******************************************************************************/
-#include <stdint.h>
  
 /*******************************************************************************
  *    DEFINITIONS
@@ -23,23 +23,29 @@
 /*******************************************************************************
  *    TYPES
  ******************************************************************************/
-typedef uint8_t fsm__state;
+enum 
+{
+    fsm__transition_signal_id_1,
+    fsm__transition_signal_id_2,
+    fsm__transition_signal_id_3,
+    fsm__transition_signal_id_4,
+    fsm__transition_signal_id_5,
+    
+    fsm__transition_signal_id_number_of
+} fsm__transition_signal_id_e;
 
-typedef struct fsm__state_table_s
+enum 
 {
-}fsm__state_table_t;
- 
- typedef struct fsm_s
-{
-    uint8_t number_of_signals;
-    uint8_t number_of_states;
-    const fsm__state_table_t * state_table;
-    fsm__state state;
-} fsm_t;
+    fsm__state_id_1,
+    fsm__state_id_2,
+    fsm__state_id_3,
+    
+    fsm__state_id_number_of
+} fsm__transition_state_id;
+
 /*******************************************************************************
  *    PROTOTYPES
  ******************************************************************************/
-void fsm__init( fsm_t * self , uint8_t total_signals , uint8_t total_states , const fsm__state_table_t * state_table , fsm__state initial_state );
- 
- 
-#endif // _FSM_H
+
+
+#endif
