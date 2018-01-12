@@ -99,14 +99,21 @@ void fsm__main( fsm_t * self )
  *******************************************************************************/
 static fsm__signal_sets_t fsm__pend( fsm_t * self )
 {
+    // Disable Interrupt here, ready to sleep
     while( self -> signal_sets == 0 )
     {
         self -> state_table[ self -> state ].on_yield();
+        
+        //Enable Interrupt briefly to receive signals
+        //Disable Interrupt, ready to sleep again
     }
     
+    //Enter critical section to prevent the signal being changed here.
     fsm__signal_sets_t signals = self -> signal_sets;
     self -> signal_sets = 0;
+    //exit critical section
     
+    //Enable Interrupt
     return signals;
 }
 
