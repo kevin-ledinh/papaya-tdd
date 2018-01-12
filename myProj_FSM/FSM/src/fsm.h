@@ -58,5 +58,9 @@ void fsm__post( fsm_t * self , uint8_t signal_idx );
 void fsm__change_state( fsm_t * self , fsm__state_t state_id );
 void fsm__main( fsm_t * self );
  
+#ifdef UNIT_TEST
+fsm__signal_sets_t fsm__pend( fsm_t * self );
+void fsm__despatch( fsm_t * self , fsm__signal_sets_t signals );
+#endif
  
 #endif // _FSM_H

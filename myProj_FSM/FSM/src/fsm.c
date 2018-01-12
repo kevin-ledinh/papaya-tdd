@@ -23,8 +23,10 @@
 /*******************************************************************************
  *    PROTOTYPES
  ******************************************************************************/
+#ifndef UNIT_TEST
 static fsm__signal_sets_t fsm__pend( fsm_t * self );
 static void fsm__despatch( fsm_t * self , fsm__signal_sets_t signals );
+#endif
 
  /*******************************************************************************
  *    PUBLIC FUNCTIONS
@@ -100,23 +102,27 @@ void fsm__main( fsm_t * self )
   *  Function:
   *  Purpose: Look into the signal set
  *******************************************************************************/
+#ifdef UNIT_TEST
+fsm__signal_sets_t fsm__pend( fsm_t * self )
+#else
 static fsm__signal_sets_t fsm__pend( fsm_t * self )
+#endif
 {
     // Disable Interrupt here, ready to sleep
     while( self -> signal_sets == 0 )
     {
         self -> state_table[ self -> state ].on_yield();
         
-        //Enable Interrupt briefly to receive signals
-        //Disable Interrupt, ready to sleep again
+        // Enable Interrupt briefly to receive signals
+        // Disable Interrupt, ready to sleep again
     }
     
-    //Enter critical section to prevent the signal being changed here.
+    // Enter critical section to prevent the signal being changed here.
     fsm__signal_sets_t signals = self -> signal_sets;
     self -> signal_sets = 0;
-    //exit critical section
+    // exit critical section
     
-    //Enable Interrupt
+    // Enable Interrupt
     return signals;
 }
 
@@ -124,13 +130,17 @@ static fsm__signal_sets_t fsm__pend( fsm_t * self )
   *  Function:
   *  Purpose: Perform an action when the receive a signal
  *******************************************************************************/
+#ifdef UNIT_TEST
+void fsm__despatch( fsm_t * self , fsm__signal_sets_t signals )
+#else
 static void fsm__despatch( fsm_t * self , fsm__signal_sets_t signals )
+#endif
 {
-   for( int i = 0 ; i < ( self -> number_of_signals ) ; i ++ )
-   {
-       if( ( ( signals >> i ) & 1 ) == 1 )
-       {
-           self -> state_table[ self -> state ].transition_table[ i ].action();
-       }
-   }
+   // for( int i = 0 ; i < ( self -> number_of_signals ) ; i ++ )
+   // {
+       // if( ( ( signals >> i ) & 1 ) == 1 )
+       // {
+           // self -> state_table[ self -> state ].transition_table[ i ].action();
+       // }
+   // }
 }

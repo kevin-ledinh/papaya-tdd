@@ -1,6 +1,11 @@
 #include "unity.h"
 #include "fsm.h"
 #include "test_fsm_data.h"
+#include <stdbool.h>
+
+static void dummy_on_entry( void );
+static void dummy_on_exit( void );
+static void dummy_on_yield( void );
 
 static const fsm__transition_table_t fsm__transition_table_state_1[ fsm__transition_signal_id_number_of ] = 
 {
@@ -29,13 +34,33 @@ static const fsm__transition_table_t fsm__transition_table_state_3[ fsm__transit
 
 static const fsm__state_table_t fsm__state_table[ fsm__state_id_number_of ] = 
 {
-    /*transition_table                  on_entry            on_exit             on_yield */
-    { fsm__transition_table_state_1 ,   fsm__none ,         fsm__none ,         fsm__none },
-    { fsm__transition_table_state_2 ,   fsm__none ,         fsm__none ,         fsm__none },
-    { fsm__transition_table_state_3 ,   fsm__none ,         fsm__none ,         fsm__none }
+    /*transition_table                  on_entry                on_exit                 on_yield */
+    { fsm__transition_table_state_1 ,   dummy_on_entry ,        dummy_on_exit ,         dummy_on_yield },
+    { fsm__transition_table_state_2 ,   dummy_on_entry ,        dummy_on_exit ,         dummy_on_yield },
+    { fsm__transition_table_state_3 ,   dummy_on_entry ,        dummy_on_exit ,         dummy_on_yield }
 };
 
 static fsm_t fsm;
+static bool on_entry_is_called;
+static bool on_exit_is_called;
+static bool on_yield_is_called;
+
+static void dummy_on_entry( void )
+{
+    on_entry_is_called = true;
+}
+
+static void dummy_on_exit( void )
+{
+    on_exit_is_called = true;
+}
+
+static void dummy_on_yield( void )
+{
+    on_yield_is_called = true;
+    // Post a signal to exit from fsm_pend()
+    fsm__post( & fsm , fsm__transition_signal_id_1 );
+}
 
 void setUp(void)
 {
@@ -81,8 +106,7 @@ void test_fsm_PostMultipleSignals(void)
 {
     fsm__post( & fsm , fsm__transition_signal_id_1 );
     fsm__post( & fsm , fsm__transition_signal_id_5 );
-    fsm__signal_sets_t test_sets = 0 | ( 1 << fsm__transition_signal_id_1 ); 
-    test_sets |= ( 1 << fsm__transition_signal_id_5 );    
+    fsm__signal_sets_t test_sets = 0 | ( 1 << fsm__transition_signal_id_1 ) | ( 1 << fsm__transition_signal_id_5 ); 
     TEST_ASSERT_EQUAL_INT( test_sets , fsm.signal_sets );
 }
 
@@ -102,4 +126,34 @@ void test_fsm_InvalidStateShouldBeZero(void)
 {
     fsm__change_state( & fsm , fsm__state_id_number_of );
     TEST_ASSERT_EQUAL_INT( 0 , fsm.state );
+}
+
+void test_fsm_CheckPendingSignalIsCorrect(void)
+{
+    fsm__post( & fsm , fsm__transition_signal_id_1 );
+    fsm__post( & fsm , fsm__transition_signal_id_5 );
+    
+    fsm__signal_sets_t test_sets = 0 | ( 1 << fsm__transition_signal_id_1 ) | ( 1 << fsm__transition_signal_id_5 ); 
+    TEST_ASSERT_EQUAL_INT( test_sets , fsm__pend( & fsm ) );
+}
+
+void test_fsm_CheckOnYieldIsCalledWhenThereIsNoSignal(void)
+{
+    on_yield_is_called = false;
+    fsm__pend( & fsm );
+    TEST_ASSERT_TRUE( on_yield_is_called );
+}
+
+void test_fsm_CheckOnExitIsCalledWhenChangeState(void)
+{
+    on_exit_is_called = false;
+    fsm__change_state( & fsm , fsm__state_id_2 );
+    TEST_ASSERT_TRUE( on_exit_is_called );
+}
+
+void test_fsm_CheckOnEntryIsCalledWhenChangeState(void)
+{
+    on_entry_is_called = false;
+    fsm__change_state( & fsm , fsm__state_id_2 );
+    TEST_ASSERT_TRUE( on_entry_is_called );
 }
