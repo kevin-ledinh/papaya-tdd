@@ -76,14 +76,12 @@ void tearDown(void)
 ============================================================================*/
 void test_dev__light_scheduler_NoChangeToLightsDuringInitialization(void)
 {
-    TEST_ASSERT_EQUAL_INT(LIGHT_ID_UNKNOWN, dev__light_ctrl_spy_get_last_id());
-    TEST_ASSERT_EQUAL_INT(LIGHT_STATE_UNKNOWN, dev__light_ctrl_spy_get_last_state());
+    checkLightState( LIGHT_ID_UNKNOWN , LIGHT_STATE_UNKNOWN );
 }
 
 void test_dev__light_scheduler_NoScheduleNothingHappens(void)
 {
-    fake_timer_service_set_day(MONDAY);
-    fake_timer_service_set_minutes(100);
+    setTimeTo( MONDAY , 100 );
     
     dev__light_scheduler_wakeup();
     
@@ -117,6 +115,46 @@ void test_dev__light_scheduler_ScheduleOffEverydayItsTime(void)
     
     dev__light_scheduler_wakeup();
     checkLightState( 3 , LIGHT_OFF );
+}
+
+void test_dev__light_scheduler_ScheduleTuesdayButItsMonday(void)
+{
+    dev__light_scheduler_schedule_turn_on(3, TUESDAY, 1200);
+    setTimeTo(MONDAY, 1200);
+    dev__light_scheduler_wakeup();
+    checkLightState(LIGHT_ID_UNKNOWN, LIGHT_STATE_UNKNOWN);
+}
+
+void test_dev__light_scheduler_ScheduleTuesdayAndItsTuesday(void)
+{
+    dev__light_scheduler_schedule_turn_on(3, TUESDAY, 1200);
+    setTimeTo(TUESDAY, 1200);
+    dev__light_scheduler_wakeup();
+    checkLightState(3, LIGHT_ON);
+}
+
+void test_dev__light_scheduler_ScheduleWeekendItsFriday(void)
+{
+    dev__light_scheduler_schedule_turn_on(3, WEEKEND, 1200);
+    setTimeTo(FRIDAY, 1200);
+    dev__light_scheduler_wakeup();
+    checkLightState(LIGHT_ID_UNKNOWN, LIGHT_STATE_UNKNOWN);
+}
+
+void test_dev__light_scheduler_ScheduleWeekendItsSat(void)
+{
+    dev__light_scheduler_schedule_turn_on(3, WEEKEND, 1200);
+    setTimeTo(SATURDAY, 1200);
+    dev__light_scheduler_wakeup();
+    checkLightState(3, LIGHT_ON);
+}
+
+void test_dev__light_scheduler_ScheduleWeekendItsSun(void)
+{
+    dev__light_scheduler_schedule_turn_on(3, WEEKEND, 1200);
+    setTimeTo(SUNDAY, 1200);
+    dev__light_scheduler_wakeup();
+    checkLightState(3, LIGHT_ON);
 }
 /*----------------------------------------------------------------------------
   private functions

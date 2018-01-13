@@ -33,6 +33,7 @@ typedef struct dev__light_scheduler_event_s
     int id;
     int event;
     int minuteOfDay;
+    Day day;
 } dev__light_scheduler_event_t;
 
 /*----------------------------------------------------------------------------
@@ -121,6 +122,7 @@ static void dev__light_scheduler_schedule_event(int id, Day day, int minutes_of_
     dev__light_scheduler_event.id = id;
     dev__light_scheduler_event.event = event;
     dev__light_scheduler_event.minuteOfDay = minutes_of_day;
+    dev__light_scheduler_event.day = day;
 }
 
 /*============================================================================
@@ -130,14 +132,26 @@ static void dev__light_scheduler_schedule_event(int id, Day day, int minutes_of_
 ============================================================================*/
 static void dev__light_scheduler_process_event_due_now( Time * time, dev__light_scheduler_event_t * lightEvent )
 {
+    int reactionDay = lightEvent->day;
+    
     if (lightEvent->id == UNUSED)
     {
         return;
     }
+    if ( ( lightEvent->day != EVERYDAY ) && ( reactionDay != time->day ) )
+    {
+        if( ! ( ( lightEvent->day == WEEKEND ) && ( ( time->day == SATURDAY ) || ( time->day == SUNDAY ) ) ) )
+        {
+            return;
+        }
+    }
+    
     if (lightEvent->minuteOfDay != time->minuteOfDay)
     {
         return;
     }
+    
+    
     dev__light_scheduler_operate_light( lightEvent );
 }
 
