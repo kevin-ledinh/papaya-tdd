@@ -15,6 +15,8 @@
 #include "unity.h"
 #include "dev__light_scheduler.h"
 #include "dev__light_scheduler_spy.h"
+#include "fake_timer_service.h"
+
 
 /*----------------------------------------------------------------------------
   manifest constants
@@ -52,6 +54,7 @@
 void setUp(void)
 {
     dev__light_ctrl_init();
+    dev__light_scheduler_init();
 }
 
 /*============================================================================
@@ -61,6 +64,8 @@ void setUp(void)
 ============================================================================*/
 void tearDown(void)
 {
+    dev__light_scheduler_deinit();
+    dev__light_ctrl_deinit();
 }
 
 /*============================================================================
@@ -74,17 +79,52 @@ void test_dev__light_scheduler_NoChangeToLightsDuringInitialization(void)
     TEST_ASSERT_EQUAL_INT(LIGHT_STATE_UNKNOWN, dev__light_ctrl_spy_get_last_state());
 }
 
-// void test_dev__light_scheduler_ScheduleOnEverydayNotTimeYet(void)
-// {
-    // LightScheduler_ScheduleTurnOn(3, EVERYDAY, 1200);
-    // FakeTimeService_SetDay(MONDAY);
-    // FakeTimeService_SetMinute(1199);
+void test_dev__light_scheduler_NoScheduleNothingHappens(void)
+{
+    fake_timer_service_set_day(MONDAY);
+    fake_timer_service_set_minutes(100);
     
-    // LightScheduler_Wakeup();
+    dev__light_scheduler_wakeup();
     
-    // LONGS_EQUAL(LIGHT_ID_UNKNOWN, LightControllerSpy_GetLastId());
-    // LONGS_EQUAL(LIGHT_STATE_UNKNOWN, LightControllerSpy_GetLastState());
-// }
+    TEST_ASSERT_EQUAL_INT(LIGHT_ID_UNKNOWN, dev__light_ctrl_spy_get_last_id());
+    TEST_ASSERT_EQUAL_INT(LIGHT_STATE_UNKNOWN, dev__light_ctrl_spy_get_last_state());
+}
+
+void test_dev__light_scheduler_ScheduleOnEverydayNotTimeYet(void)
+{
+    dev__light_scheduler_schedule_turn_on(3, EVERYDAY, 1200);
+    fake_timer_service_set_day(MONDAY);
+    fake_timer_service_set_minutes(1199);
+    
+    dev__light_scheduler_wakeup();
+    
+    TEST_ASSERT_EQUAL_INT(LIGHT_ID_UNKNOWN, dev__light_ctrl_spy_get_last_id());
+    TEST_ASSERT_EQUAL_INT(LIGHT_STATE_UNKNOWN, dev__light_ctrl_spy_get_last_state());
+}
+
+void test_dev__light_scheduler_ScheduleOnEverydayItsTime(void)
+{
+    dev__light_scheduler_schedule_turn_on(3, EVERYDAY, 1200);
+    fake_timer_service_set_day(MONDAY);
+    fake_timer_service_set_minutes(1200);
+    
+    dev__light_scheduler_wakeup();
+    
+    TEST_ASSERT_EQUAL_INT(3, dev__light_ctrl_spy_get_last_id());
+    TEST_ASSERT_EQUAL_INT(LIGHT_ON, dev__light_ctrl_spy_get_last_state());
+}
+
+void test_dev__light_scheduler_ScheduleOffEverydayItsTime(void)
+{
+    dev__light_scheduler_schedule_turn_off(3, EVERYDAY, 1200);
+    fake_timer_service_set_day(MONDAY);
+    fake_timer_service_set_minutes(1200);
+    
+    dev__light_scheduler_wakeup();
+    
+    TEST_ASSERT_EQUAL_INT(3, dev__light_ctrl_spy_get_last_id());
+    TEST_ASSERT_EQUAL_INT(LIGHT_OFF, dev__light_ctrl_spy_get_last_state());
+}
 /*----------------------------------------------------------------------------
   private functions
 ----------------------------------------------------------------------------*/
