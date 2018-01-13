@@ -1,8 +1,8 @@
 /*============================================================================
-@brief A C source for lighting controller spy
+@brief A C source for the fake timer service
 ------------------------------------------------------------------------------
-<!-- Written by Andy Ackland -->
-<!-- Copyright (C) 2013 All rights reserved -->
+<!-- Written by Kevin Le Dinh -->
+<!-- Copyright (C) 2018 All rights reserved -->
 ============================================================================*/
 
 /*----------------------------------------------------------------------------
@@ -12,7 +12,8 @@
 /*----------------------------------------------------------------------------
   include files
 ----------------------------------------------------------------------------*/
-#include "dev__light_scheduler_spy.h"
+#include "fake_timer_service.h"
+#include "timer_service.h"
 
 /*----------------------------------------------------------------------------
   manifest constants
@@ -37,73 +38,42 @@
 /*----------------------------------------------------------------------------
   static variables
 ----------------------------------------------------------------------------*/
-static int dev__light_scheduler_spy_last_id;
-static int dev__light_scheduler_spy_last_state;
-
+static Time _time;
 /*----------------------------------------------------------------------------
   public functions
 ----------------------------------------------------------------------------*/
 
 /*============================================================================
-@brief The double initialization
+@brief
 ------------------------------------------------------------------------------
 @note
 ============================================================================*/
-void dev__light_ctrl_init( void )
+void fake_timer_service_set_day( Day day )
 {
-    dev__light_scheduler_spy_last_id = LIGHT_ID_UNKNOWN;
-    dev__light_scheduler_spy_last_state = LIGHT_STATE_UNKNOWN;
+    _time.day = day;
 }
 
 /*============================================================================
-@brief Switch a dummy LED on
+@brief
 ------------------------------------------------------------------------------
 @note
 ============================================================================*/
-void dev__light_ctrl_on( int id )
+void fake_timer_service_set_minutes( int minutes )
 {
-    dev__light_scheduler_spy_last_id = id;
-    dev__light_scheduler_spy_last_state = LIGHT_ON;
+    _time.minuteOfDay = minutes;
 }
 
 /*============================================================================
-@brief Switch a dummy LED off
+@brief
 ------------------------------------------------------------------------------
 @note
 ============================================================================*/
-void dev__light_ctrl_off( int id )
+void time_service_get_time( Time * time )
 {
-    dev__light_scheduler_spy_last_id = id;
-    dev__light_scheduler_spy_last_state = LIGHT_OFF;
+    time -> day = _time.day;
+    time -> minuteOfDay = _time.minuteOfDay;
 }
 
-/*============================================================================
-@brief Return the LED ID
-------------------------------------------------------------------------------
-@note
-============================================================================*/
-int dev__light_ctrl_spy_get_last_id( void )
-{
-    return dev__light_scheduler_spy_last_id;
-}
-
-/*============================================================================
-@brief Return the LED state
-------------------------------------------------------------------------------
-@note
-============================================================================*/
-int dev__light_ctrl_spy_get_last_state( void )
-{
-    return dev__light_scheduler_spy_last_state;
-}
-
-/*============================================================================
-@brief Return the LED state
-------------------------------------------------------------------------------
-@note
-============================================================================*/
-void dev__light_ctrl_deinit( void )
-{}
 /*----------------------------------------------------------------------------
   private functions
 ----------------------------------------------------------------------------*/

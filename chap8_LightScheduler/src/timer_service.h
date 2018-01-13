@@ -1,21 +1,22 @@
 /*============================================================================
-@brief A C source header for the lighting controller
+@brief A C source header for the real timer service
 ------------------------------------------------------------------------------
-<!-- Written by Kevin Le DInh -->
+<!-- Written by Kevin Le Dinh -->
 <!-- Copyright (C) 2018 All rights reserved -->
 ============================================================================*/
 
-#ifndef dev__light_controller_h
-#define dev__light_controller_h
+#ifndef timer_service_h
+#define timer_service_h
 
 /*----------------------------------------------------------------------------
   @brief
-          This file contains function declarations for testing purposes
+
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
   nested include files
 ----------------------------------------------------------------------------*/
+#include "dev__light_scheduler.h"
 
 /*----------------------------------------------------------------------------
   macros
@@ -28,6 +29,12 @@
 /*----------------------------------------------------------------------------
   type definitions
 ----------------------------------------------------------------------------*/
+struct Time
+{
+    Day day;
+    int minuteOfDay;
+};
+typedef struct Time Time;
 
 /*----------------------------------------------------------------------------
   extern variables
@@ -36,10 +43,7 @@
 /*----------------------------------------------------------------------------
   prototypes
 ----------------------------------------------------------------------------*/
-void dev__light_ctrl_init( void );
-void dev__light_ctrl_on( int id );
-void dev__light_ctrl_off( int id );
-void dev__light_ctrl_deinit( void );
+void time_service_get_time( Time * time );
 
 /*----------------------------------------------------------------------------
   compile time checks

@@ -26,7 +26,21 @@
 /*----------------------------------------------------------------------------
   type definitions
 ----------------------------------------------------------------------------*/
+enum Day {
+    NONE=-1, 
+    EVERYDAY=10, 
+    WEEKDAY, 
+    WEEKEND,
+    SUNDAY=1, 
+    MONDAY, 
+    TUESDAY, 
+    WEDNESDAY, 
+    THURSDAY, 
+    FRIDAY, 
+    SATURDAY
+};
 
+typedef enum Day Day;
 /*----------------------------------------------------------------------------
   extern variables
 ----------------------------------------------------------------------------*/
@@ -34,6 +48,11 @@
 /*----------------------------------------------------------------------------
   prototypes
 ----------------------------------------------------------------------------*/
+void dev__light_scheduler_init( void );
+void dev__light_scheduler_deinit( void );
+void dev__light_scheduler_wakeup( void );
+void dev__light_scheduler_schedule_turn_on( int id , Day day , int minutes_of_day );
+void dev__light_scheduler_schedule_turn_off( int id , Day day , int minutes_of_day );
 
 /*----------------------------------------------------------------------------
   compile time checks

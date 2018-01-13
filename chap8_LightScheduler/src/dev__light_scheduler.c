@@ -13,14 +13,27 @@
   include files
 ----------------------------------------------------------------------------*/
 #include "dev__light_scheduler.h"
+#include "dev__light_controller.h"
+#include "timer_service.h"
 
 /*----------------------------------------------------------------------------
   manifest constants
 ----------------------------------------------------------------------------*/
-
+enum dev__light_scheduler_event
+{
+    UNUSED,
+    TURN_ON,
+    TURN_OFF
+};
 /*----------------------------------------------------------------------------
   type definitions
 ----------------------------------------------------------------------------*/
+typedef struct dev__light_scheduler_event_s
+{
+    int id;
+    int event;
+    int minuteOfDay;
+} dev__light_scheduler_event_t;
 
 /*----------------------------------------------------------------------------
   macros
@@ -37,7 +50,7 @@
 /*----------------------------------------------------------------------------
   static variables
 ----------------------------------------------------------------------------*/
-
+static dev__light_scheduler_event_t dev__light_scheduler_event;
 /*----------------------------------------------------------------------------
   public functions
 ----------------------------------------------------------------------------*/
@@ -47,7 +60,72 @@
 ------------------------------------------------------------------------------
 @note
 ============================================================================*/
+void dev__light_scheduler_init( void )
+{
+    dev__light_scheduler_event.id = UNUSED;
+}
 
+/*============================================================================
+@brief
+------------------------------------------------------------------------------
+@note
+============================================================================*/
+void dev__light_scheduler_deinit( void )
+{}
+
+/*============================================================================
+@brief
+------------------------------------------------------------------------------
+@note
+============================================================================*/
+void dev__light_scheduler_wakeup( void )
+{
+    Time time;
+    time_service_get_time(&time);
+    
+    if (dev__light_scheduler_event.id == UNUSED)
+    {
+        return;
+    }
+    
+    if (time.minuteOfDay != dev__light_scheduler_event.minuteOfDay)
+    {
+        return;
+    }
+    
+    if (dev__light_scheduler_event.event == TURN_ON)
+    {
+        dev__light_ctrl_on(dev__light_scheduler_event.id);
+    }
+    else if (dev__light_scheduler_event.event == TURN_OFF)
+    {
+        dev__light_ctrl_off(dev__light_scheduler_event.id);
+    }
+}
+
+/*============================================================================
+@brief
+------------------------------------------------------------------------------
+@note
+============================================================================*/
+void dev__light_scheduler_schedule_turn_on( int id , Day day , int minutes_of_day )
+{
+    dev__light_scheduler_event.id = id;
+    dev__light_scheduler_event.event = TURN_ON;
+    dev__light_scheduler_event.minuteOfDay = minutes_of_day;
+}
+
+/*============================================================================
+@brief
+------------------------------------------------------------------------------
+@note
+============================================================================*/
+void dev__light_scheduler_schedule_turn_off( int id , Day day , int minutes_of_day )
+{
+    dev__light_scheduler_event.id = id;
+    dev__light_scheduler_event.event = TURN_OFF;
+    dev__light_scheduler_event.minuteOfDay = minutes_of_day;
+}
 /*----------------------------------------------------------------------------
   private functions
 ----------------------------------------------------------------------------*/
