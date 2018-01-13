@@ -1,14 +1,16 @@
 /*============================================================================
-@brief A C source header for a Lighting Scheduler
+@brief A C source header for the lighting controller
 ------------------------------------------------------------------------------
-<!-- Written by Kevin Le Dinh -->
+<!-- Written by Kevin Le DInh -->
 <!-- Copyright (C) 2018 All rights reserved -->
 ============================================================================*/
-#ifndef _DEV__LIGHT_SCHEDULER_H
-#define _DEV__LIGHT_SCHEDULER_H
+
+#ifndef dev__light_controller_h
+#define dev__light_controller_h
 
 /*----------------------------------------------------------------------------
-  @brief This is an exercise for TDD
+  @brief
+          This file contains function declarations for testing purposes
 ----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------
@@ -34,14 +36,16 @@
 /*----------------------------------------------------------------------------
   prototypes
 ----------------------------------------------------------------------------*/
+void dev__light_ctrl_init( void );
+void dev__light_ctrl_on( int id );
+void dev__light_ctrl_off( int id );
 
 /*----------------------------------------------------------------------------
   compile time checks
 ----------------------------------------------------------------------------*/
 
+#endif
 
-#endif // _DEV__LIGHT_SCHEDULER_H
 /*----------------------------------------------------------------------------
   End of file
 ----------------------------------------------------------------------------*/
-
