@@ -36,6 +36,14 @@ struct Time
 };
 typedef struct Time Time;
 
+typedef void ( * time_service_alarm_callback_t ) ( void );
+
+typedef struct time_service_alarm_s
+{
+    int period_seconds;
+    time_service_alarm_callback_t alarm_callback;
+}time_service_alarm_t;
+
 /*----------------------------------------------------------------------------
   extern variables
 ----------------------------------------------------------------------------*/
@@ -44,6 +52,7 @@ typedef struct Time Time;
   prototypes
 ----------------------------------------------------------------------------*/
 void time_service_get_time( Time * time );
+void time_service_set_periodic_alarm_in_seconds( int seconds , time_service_alarm_callback_t callback );
 
 /*----------------------------------------------------------------------------
   compile time checks

@@ -156,6 +156,20 @@ void test_dev__light_scheduler_ScheduleWeekendItsSun(void)
     dev__light_scheduler_wakeup();
     checkLightState(3, LIGHT_ON);
 }
+
+void test_dev__light_scheduler_ScheduleWeekendItsMonday(void)
+{
+    dev__light_scheduler_schedule_turn_on(3, WEEKEND, 1200);
+    setTimeTo(MONDAY, 1200);
+    dev__light_scheduler_wakeup();
+    checkLightState(LIGHT_ID_UNKNOWN, LIGHT_STATE_UNKNOWN);
+}
+
+void test_dev__light_scheduler_CreateStartsOneMinuteAlarm(void)
+{
+    TEST_ASSERT_EQUAL_PTR( dev__light_scheduler_wakeup , fake_timer_service_get_alarm_callback());
+    TEST_ASSERT_EQUAL_INT(60, fake_timer_service_get_alarm_period());
+}
 /*----------------------------------------------------------------------------
   private functions
 ----------------------------------------------------------------------------*/

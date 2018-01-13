@@ -17,6 +17,7 @@
   nested include files
 ----------------------------------------------------------------------------*/
 #include "dev__light_scheduler.h"
+#include "timer_service.h"
 
 /*----------------------------------------------------------------------------
   macros
@@ -39,6 +40,9 @@ enum {TIME_UNKNOWN = -1};
 ----------------------------------------------------------------------------*/
 void fake_timer_service_set_day( Day day );
 void fake_timer_service_set_minutes( int minutes );
+time_service_alarm_callback_t fake_timer_service_get_alarm_callback( void );
+int fake_timer_service_get_alarm_period( void );
+
 /*----------------------------------------------------------------------------
   compile time checks
 ----------------------------------------------------------------------------*/

@@ -15,6 +15,7 @@
 #include "dev__light_scheduler.h"
 #include "dev__light_controller.h"
 #include "timer_service.h"
+#include <stdbool.h>
 
 /*----------------------------------------------------------------------------
   manifest constants
@@ -46,6 +47,7 @@ typedef struct dev__light_scheduler_event_s
 static void dev__light_scheduler_schedule_event(int id, Day day, int minutes_of_day, int event);
 static void dev__light_scheduler_process_event_due_now( Time * time, dev__light_scheduler_event_t * lightEvent );
 static void dev__light_scheduler_operate_light(dev__light_scheduler_event_t * lightEvent);
+static bool dev__light_scheduler_does_light_respond_today( Time * time, int reaction_day );
 
 /*----------------------------------------------------------------------------
   global variables
@@ -67,6 +69,8 @@ static dev__light_scheduler_event_t dev__light_scheduler_event;
 void dev__light_scheduler_init( void )
 {
     dev__light_scheduler_event.id = UNUSED;
+    
+    time_service_set_periodic_alarm_in_seconds( 60, dev__light_scheduler_wakeup );
 }
 
 /*============================================================================
@@ -131,19 +135,14 @@ static void dev__light_scheduler_schedule_event(int id, Day day, int minutes_of_
 @note
 ============================================================================*/
 static void dev__light_scheduler_process_event_due_now( Time * time, dev__light_scheduler_event_t * lightEvent )
-{
-    int reactionDay = lightEvent->day;
-    
+{    
     if (lightEvent->id == UNUSED)
     {
         return;
     }
-    if ( ( lightEvent->day != EVERYDAY ) && ( reactionDay != time->day ) )
+    if ( ! dev__light_scheduler_does_light_respond_today( time , lightEvent->day ) )
     {
-        if( ! ( ( lightEvent->day == WEEKEND ) && ( ( time->day == SATURDAY ) || ( time->day == SUNDAY ) ) ) )
-        {
-            return;
-        }
+        return;
     }
     
     if (lightEvent->minuteOfDay != time->minuteOfDay)
@@ -170,6 +169,33 @@ static void dev__light_scheduler_operate_light(dev__light_scheduler_event_t * li
     {
         dev__light_ctrl_off(lightEvent->id);
     }
+}
+
+/*============================================================================
+@brief
+------------------------------------------------------------------------------
+@note
+============================================================================*/
+static bool dev__light_scheduler_does_light_respond_today( Time * time, int reaction_day )
+{
+    int today = time->day;
+    if (reaction_day == EVERYDAY)
+    {
+        return true;
+    }
+    if (reaction_day == today)
+    {
+        return true;
+    }
+    if (reaction_day == WEEKEND && (SATURDAY == today || SUNDAY == today))
+    {
+        return true;
+    }
+    if (reaction_day == WEEKDAY && today >= MONDAY && today <= FRIDAY)
+    {
+        return true;
+    }   
+    return false;
 }
 /*----------------------------------------------------------------------------
   End of file
