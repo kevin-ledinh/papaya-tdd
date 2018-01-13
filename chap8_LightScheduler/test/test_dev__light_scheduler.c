@@ -33,7 +33,8 @@
 /*----------------------------------------------------------------------------
   prototypes
 ----------------------------------------------------------------------------*/
-
+static void setTimeTo(int day, int minuteOfDay);
+static void checkLightState(int id, int level);
 /*----------------------------------------------------------------------------
   global variables
 ----------------------------------------------------------------------------*/
@@ -86,49 +87,51 @@ void test_dev__light_scheduler_NoScheduleNothingHappens(void)
     
     dev__light_scheduler_wakeup();
     
-    TEST_ASSERT_EQUAL_INT(LIGHT_ID_UNKNOWN, dev__light_ctrl_spy_get_last_id());
-    TEST_ASSERT_EQUAL_INT(LIGHT_STATE_UNKNOWN, dev__light_ctrl_spy_get_last_state());
+    checkLightState( LIGHT_ID_UNKNOWN , LIGHT_STATE_UNKNOWN );
 }
 
 void test_dev__light_scheduler_ScheduleOnEverydayNotTimeYet(void)
 {
     dev__light_scheduler_schedule_turn_on(3, EVERYDAY, 1200);
-    fake_timer_service_set_day(MONDAY);
-    fake_timer_service_set_minutes(1199);
+    setTimeTo( MONDAY , 1199 );
     
     dev__light_scheduler_wakeup();
     
-    TEST_ASSERT_EQUAL_INT(LIGHT_ID_UNKNOWN, dev__light_ctrl_spy_get_last_id());
-    TEST_ASSERT_EQUAL_INT(LIGHT_STATE_UNKNOWN, dev__light_ctrl_spy_get_last_state());
+    checkLightState( LIGHT_ID_UNKNOWN , LIGHT_STATE_UNKNOWN );
 }
 
 void test_dev__light_scheduler_ScheduleOnEverydayItsTime(void)
 {
     dev__light_scheduler_schedule_turn_on(3, EVERYDAY, 1200);
-    fake_timer_service_set_day(MONDAY);
-    fake_timer_service_set_minutes(1200);
+    setTimeTo( MONDAY , 1200 );
     
     dev__light_scheduler_wakeup();
     
-    TEST_ASSERT_EQUAL_INT(3, dev__light_ctrl_spy_get_last_id());
-    TEST_ASSERT_EQUAL_INT(LIGHT_ON, dev__light_ctrl_spy_get_last_state());
+    checkLightState( 3 , LIGHT_ON );
 }
 
 void test_dev__light_scheduler_ScheduleOffEverydayItsTime(void)
 {
     dev__light_scheduler_schedule_turn_off(3, EVERYDAY, 1200);
-    fake_timer_service_set_day(MONDAY);
-    fake_timer_service_set_minutes(1200);
+    setTimeTo( MONDAY , 1200 );
     
     dev__light_scheduler_wakeup();
-    
-    TEST_ASSERT_EQUAL_INT(3, dev__light_ctrl_spy_get_last_id());
-    TEST_ASSERT_EQUAL_INT(LIGHT_OFF, dev__light_ctrl_spy_get_last_state());
+    checkLightState( 3 , LIGHT_OFF );
 }
 /*----------------------------------------------------------------------------
   private functions
 ----------------------------------------------------------------------------*/
+static void setTimeTo(int day, int minuteOfDay)
+{
+    fake_timer_service_set_day(day);
+    fake_timer_service_set_minutes(minuteOfDay);
+}
 
+static void checkLightState(int id, int level)
+{
+    TEST_ASSERT_EQUAL_INT(id, dev__light_ctrl_spy_get_last_id());
+    TEST_ASSERT_EQUAL_INT(level, dev__light_ctrl_spy_get_last_state());
+}
 /*----------------------------------------------------------------------------
   End of file
 ----------------------------------------------------------------------------*/

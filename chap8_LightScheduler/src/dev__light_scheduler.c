@@ -42,6 +42,9 @@ typedef struct dev__light_scheduler_event_s
 /*----------------------------------------------------------------------------
   prototypes
 ----------------------------------------------------------------------------*/
+static void dev__light_scheduler_schedule_event(int id, Day day, int minutes_of_day, int event);
+static void dev__light_scheduler_process_event_due_now( Time * time, dev__light_scheduler_event_t * lightEvent );
+static void dev__light_scheduler_operate_light(dev__light_scheduler_event_t * lightEvent);
 
 /*----------------------------------------------------------------------------
   global variables
@@ -83,24 +86,7 @@ void dev__light_scheduler_wakeup( void )
     Time time;
     time_service_get_time(&time);
     
-    if (dev__light_scheduler_event.id == UNUSED)
-    {
-        return;
-    }
-    
-    if (time.minuteOfDay != dev__light_scheduler_event.minuteOfDay)
-    {
-        return;
-    }
-    
-    if (dev__light_scheduler_event.event == TURN_ON)
-    {
-        dev__light_ctrl_on(dev__light_scheduler_event.id);
-    }
-    else if (dev__light_scheduler_event.event == TURN_OFF)
-    {
-        dev__light_ctrl_off(dev__light_scheduler_event.id);
-    }
+    dev__light_scheduler_process_event_due_now( & time , & dev__light_scheduler_event );
 }
 
 /*============================================================================
@@ -110,9 +96,7 @@ void dev__light_scheduler_wakeup( void )
 ============================================================================*/
 void dev__light_scheduler_schedule_turn_on( int id , Day day , int minutes_of_day )
 {
-    dev__light_scheduler_event.id = id;
-    dev__light_scheduler_event.event = TURN_ON;
-    dev__light_scheduler_event.minuteOfDay = minutes_of_day;
+    dev__light_scheduler_schedule_event( id , day , minutes_of_day , TURN_ON );
 }
 
 /*============================================================================
@@ -122,14 +106,57 @@ void dev__light_scheduler_schedule_turn_on( int id , Day day , int minutes_of_da
 ============================================================================*/
 void dev__light_scheduler_schedule_turn_off( int id , Day day , int minutes_of_day )
 {
-    dev__light_scheduler_event.id = id;
-    dev__light_scheduler_event.event = TURN_OFF;
-    dev__light_scheduler_event.minuteOfDay = minutes_of_day;
+    dev__light_scheduler_schedule_event( id , day , minutes_of_day , TURN_OFF );
 }
 /*----------------------------------------------------------------------------
   private functions
 ----------------------------------------------------------------------------*/
+/*============================================================================
+@brief
+------------------------------------------------------------------------------
+@note
+============================================================================*/
+static void dev__light_scheduler_schedule_event(int id, Day day, int minutes_of_day, int event)
+{
+    dev__light_scheduler_event.id = id;
+    dev__light_scheduler_event.event = event;
+    dev__light_scheduler_event.minuteOfDay = minutes_of_day;
+}
 
+/*============================================================================
+@brief
+------------------------------------------------------------------------------
+@note
+============================================================================*/
+static void dev__light_scheduler_process_event_due_now( Time * time, dev__light_scheduler_event_t * lightEvent )
+{
+    if (lightEvent->id == UNUSED)
+    {
+        return;
+    }
+    if (lightEvent->minuteOfDay != time->minuteOfDay)
+    {
+        return;
+    }
+    dev__light_scheduler_operate_light( lightEvent );
+}
+
+/*============================================================================
+@brief
+------------------------------------------------------------------------------
+@note
+============================================================================*/
+static void dev__light_scheduler_operate_light(dev__light_scheduler_event_t * lightEvent)
+{
+    if (lightEvent->event == TURN_ON)
+    {
+        dev__light_ctrl_on(lightEvent->id);
+    }
+    else if (lightEvent->event == TURN_OFF)
+    {
+        dev__light_ctrl_off(lightEvent->id);
+    }
+}
 /*----------------------------------------------------------------------------
   End of file
 ----------------------------------------------------------------------------*/
