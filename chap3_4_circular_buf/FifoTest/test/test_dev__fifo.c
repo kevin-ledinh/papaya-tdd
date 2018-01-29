@@ -1,10 +1,59 @@
+/*============================================================================
+@brief A C source template
+------------------------------------------------------------------------------
+<!-- Written by Kevin (Phuc) Le Dinh -->
+<!-- Copyright (C) 2018 All rights reserved -->
+============================================================================*/
+
+/*----------------------------------------------------------------------------
+  @brief
+----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+  include files
+----------------------------------------------------------------------------*/
 #include "unity.h"
+#include "hw__fake_memory.h"
 #include "dev__fifo.h"
+#include <stdint.h>
 
-static int * fifo_addr;
+/*----------------------------------------------------------------------------
+  manifest constants
+----------------------------------------------------------------------------*/
 
-extern int * dev__fifo_get_fifo_address( void );
+/*----------------------------------------------------------------------------
+  type definitions
+----------------------------------------------------------------------------*/
 
+/*----------------------------------------------------------------------------
+  macros
+----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+  prototypes
+----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+  global variables
+----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+  static variables
+----------------------------------------------------------------------------*/
+static uint8_t temp_packet[] = 
+{ 
+    0x0D , 0x0A , 0x3E , 0x3E , 0x4D , 0x24 , 0x62 , 0x5A , 0x02 , 0x01 , 0x17 
+};
+
+/*----------------------------------------------------------------------------
+  public functions
+----------------------------------------------------------------------------*/
+
+/*============================================================================
+@brief
+------------------------------------------------------------------------------
+@note
+============================================================================*/
 void setUp(void)
 {
     dev__fifo_init();
@@ -12,84 +61,140 @@ void setUp(void)
 
 void tearDown(void)
 {
+    dev__fifo_deinit();
 }
 
-void test_InitializeAllElementsToZeros(void)
+/*============================================================================
+@brief
+------------------------------------------------------------------------------
+@note
+============================================================================*/
+void test_dev__fifo_EmptyAfterCreation(void)
 {
-    fifo_addr = dev__fifo_get_fifo_address();
-    TEST_ASSERT_EACH_EQUAL_INT( 0 , fifo_addr , MAX_FIFO_LEN );
-}
-
-void test_AddOneElementToFifo(void)
-{
-    dev__fifo_put(1);
-    TEST_ASSERT_EQUAL_INT( 1 , fifo_addr[ 0 ] );
-}
-
-void test_GetOneElementFromFifo(void)
-{
-    dev__fifo_put(123);
-    TEST_ASSERT_EQUAL_INT( 123 , dev__fifo_get() );
-}
-
-void test_AddMultipleElementsToFifo(void)
-{
-    dev__fifo_put(123);
-    dev__fifo_put(456);
-    TEST_ASSERT_EQUAL_INT( 123 , fifo_addr[ 0 ] );
-    TEST_ASSERT_EQUAL_INT( 456 , fifo_addr[ 1 ] );
-}
-
-void test_GetMultipleElementsFromFifo(void)
-{
-    dev__fifo_put(123);
-    dev__fifo_put(456);
-    TEST_ASSERT_EQUAL_INT( 123 , dev__fifo_get() );
-    TEST_ASSERT_EQUAL_INT( 456 , dev__fifo_get() );
-}
-
-void test_GetNumberOfElementsAfterAdd(void)
-{
-    dev__fifo_put(123);
-    dev__fifo_put(456);
-    TEST_ASSERT_EQUAL_INT( 2 , dev__fifo_get_available_entries() );
-}
-
-void test_GetNumberofEntriesAfterRemoveSomeElements(void)
-{
-    dev__fifo_put(123);
-    dev__fifo_put(456);
-    dev__fifo_put(789);
-    dev__fifo_get();
-    TEST_ASSERT_EQUAL_INT( 2 , dev__fifo_get_available_entries() );    
-}
-
-void test_AddMoreElementThanMaxEntries(void)
-{
-    int expected_values [ MAX_FIFO_LEN ] = { 17 , 2 , 3 , 4 , 5 , 6 , 7 , 8 , 9 , 10 , 11 , 12 , 13 , 14 , 15 , 16 };
-    int count;
-    for( count  = 1 ; count <= ( MAX_FIFO_LEN + 1 ) ; count ++ )
-    {
-        dev__fifo_put( count );
-    }
     
-    TEST_ASSERT_EQUAL_INT_ARRAY( expected_values , fifo_addr , MAX_FIFO_LEN );
+    TEST_ASSERT_TRUE( dev__fifo_is_empty() );
 }
 
-void test_GetElementAfterOutOfBound(void)
+/*============================================================================
+@brief
+------------------------------------------------------------------------------
+@note
+============================================================================*/
+void test_dev__fifo_NotEmpty(void)
 {
-    int expected_values [ MAX_FIFO_LEN ] = { 2 , 3 , 4 , 5 , 6 , 7 , 8 , 9 , 10 , 11 , 12 , 13 , 14 , 15 , 16 , 17 };
-    int count;
-    for( count  = 1 ; count <= ( MAX_FIFO_LEN + 1 ) ; count ++ )
+    dev__fifo_put( temp_packet , sizeof ( temp_packet ) );
+    TEST_ASSERT_FALSE( dev__fifo_is_empty() );
+}
+
+/*============================================================================
+@brief
+------------------------------------------------------------------------------
+@note
+============================================================================*/
+void test_dev__fifo_NotEmptyThenEmpty(void)
+{
+    uint8_t test_value = 0xFF;
+    dev__fifo_put( & test_value , 1 );
+    TEST_ASSERT_FALSE( dev__fifo_is_empty() );
+    uint8_t return_value = dev__fifo_get();
+    TEST_ASSERT_TRUE( dev__fifo_is_empty() );
+}
+
+/*============================================================================
+@brief
+------------------------------------------------------------------------------
+@note
+============================================================================*/
+void test_dev__fifo_GetPutOneValue(void)
+{
+    uint8_t test_value = 0xFF;
+    dev__fifo_put( & test_value , 1 );
+    TEST_ASSERT_EQUAL_UINT8( test_value , dev__fifo_get() );
+}
+
+/*============================================================================
+@brief
+------------------------------------------------------------------------------
+@note
+============================================================================*/
+void test_dev__fifo_GetPutAFew(void)
+{
+    dev__fifo_put( temp_packet , sizeof ( temp_packet ) );
+    for( int idx = 0 ; idx < sizeof ( temp_packet ) ; idx ++ )
     {
-        dev__fifo_put( count );
-    }
-    
-    for( count  = 0 ; count < MAX_FIFO_LEN ; count ++ )
-    {
-        TEST_ASSERT_EQUAL_INT( expected_values[ count ] , dev__fifo_get() );
+        TEST_ASSERT_EQUAL_UINT8( temp_packet[ idx ] , dev__fifo_get() );
     }
 }
 
-//TODO: test for empty Fifo when do a get()
-//TODO: add test for mutex operation.
+/*============================================================================
+@brief
+------------------------------------------------------------------------------
+@note
+============================================================================*/
+void test_dev__fifo_IsFull(void)
+{
+    uint8_t temp = 0;
+    for( int idx = 0 ; idx < MAX_FIFO_LEN ; idx ++ )
+    {
+        temp = ( uint8_t ) ( idx & 0xFF );
+        dev__fifo_put( & temp , 1 );
+    }
+    printf("size: %d" , dev__fifo_get_current_size() );
+    TEST_ASSERT_TRUE( dev__fifo_is_full() );
+}
+
+/*============================================================================
+@brief
+------------------------------------------------------------------------------
+@note
+============================================================================*/
+void test_dev__fifo_EmptyToFullToEmpty(void)
+{
+    uint8_t temp = 0;
+    for( int idx = 0 ; idx < MAX_FIFO_LEN ; idx ++ )
+    {
+        temp = ( uint8_t ) ( idx & 0xFF );
+        dev__fifo_put( & temp , 1 );
+    }
+    TEST_ASSERT_TRUE( dev__fifo_is_full() );
+
+    for( int idx = 0 ; idx < MAX_FIFO_LEN ; idx ++ )
+    {
+        temp = dev__fifo_get();
+    }
+    TEST_ASSERT_TRUE( dev__fifo_is_empty() );
+}
+
+/*============================================================================
+@brief
+------------------------------------------------------------------------------
+@note
+============================================================================*/
+void test_dev__fifo_WrapAround(void)
+{
+    uint8_t temp = 100;
+    for( int idx = 0 ; idx < MAX_FIFO_LEN ; idx ++ )
+    {
+        dev__fifo_put( & temp , 1 );
+    }
+    TEST_ASSERT_TRUE( dev__fifo_is_full() );
+    TEST_ASSERT_EQUAL_UINT8( 100 , dev__fifo_get() );
+    TEST_ASSERT_FALSE( dev__fifo_is_full() );
+    temp = 0x22;
+    dev__fifo_put( & temp , 1 );
+    TEST_ASSERT_TRUE( dev__fifo_is_full() );
+
+    for( int idx = 1 ; idx < MAX_FIFO_LEN ; idx ++ )
+    {
+        TEST_ASSERT_EQUAL_UINT8( 100 , dev__fifo_get() );
+    }
+    TEST_ASSERT_EQUAL_UINT8( 0x22 , dev__fifo_get() );
+    TEST_ASSERT_TRUE( dev__fifo_is_empty() );
+}
+/*----------------------------------------------------------------------------
+  private functions
+----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------
+  End of file
+----------------------------------------------------------------------------*/
